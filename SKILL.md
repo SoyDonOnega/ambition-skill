@@ -1,104 +1,88 @@
 ---
 name: ambition
 description: >-
-  Rewrites a task prompt to be more ambitious along three lenses — altitude (the outcome
-  behind the task), depth (how a field-leading professional would do it, from raw
-  material, judged by something outside the model) and range (methods from other fields)
-  — and returns the rewritten prompt for the user to confirm before running it. Use when
-  the user runs /ambition <prompt>, optionally with +altitude, +depth or +range.
+  Benchmarks the work at hand against how a field-leading professional would do it:
+  extracts their practices, techniques and tools from real exemplars, scores current
+  practice against them on a 0–3 scale, has an isolated critic check the result, and
+  returns a ranked adoption plan, then waits for the user to pick what to implement.
+  Use when the user runs /ambition, optionally with a task, path or process.
 license: MIT
-argument-hint: "[+altitude | +depth | +range] <prompt or task>"
+compatibility: Needs web search and the ability to spawn an isolated subagent.
+argument-hint: "[+range] [task, path or process]"
 disable-model-invocation: true
 ---
 
 # Ambition
 
-Takes a prompt or task and returns a **deeper, higher and wider** version of it — not a bigger one — plus what the agent would need to carry it out. It does not run the task: it shows the rewritten prompt and waits for the user to confirm, change or drop it.
+Takes the work at hand and shows how a field-leading professional would do it: which practices, techniques and tools they use, how far current practice is from them, and a ranked plan to adopt what is worth adopting here. It does not implement anything: it shows the report and waits for the user to pick a plan item, change the report or drop it.
 
-Based on Felix Rieseberg, *How to be more ambitious: A tutorial for humans with models* (13 October 2026, felixrieseberg.com). The wording and the altitude and range checklists here are our own adaptation.
+Paths in this file are relative to the skill root (the folder that contains this SKILL.md).
 
 ## When invoked
 
-1. Take the input after `/ambition` (pasted prompt, task or attached brief). If it is empty, ask once for the prompt to work on.
-2. Select lenses: `+altitude`, `+depth`, `+range` (one or more). No flag means all three.
-3. Read only the context needed to ground the answers (attached files, the repo, data the user points to). Do not start the task itself.
-4. Answer the questions of each selected lens (below) in short bullets tied to this task — never generic advice.
-5. Write the **rewritten prompt**: one prompt, ready to run, in the user's language, that asks for exactly what the lenses found — outcome, raw material, methods and tools, the outside judge and how the result is checked, the methods borrowed from other fields, the deliverable, and what not to do.
-6. List what the agent needs that is not available yet (data, access, tools, a place to run and verify).
-7. Produce the output template and end with the confirmation question. Stop.
-8. Next turn:
-   - **Yes** ("sí", "adelante", "hazlo") → run the rewritten prompt as normal work.
-   - **Changes** → apply them to the prompt, show the full output again and ask again.
+1. **Fix the object.** No argument → the work of the current session and the project it runs in. Argument → that task, path or process. State what the work is, what it is for and who uses the result. Read only the context needed (session, files, repo). If the object is still unclear, ask once.
+2. **Current practice.** List how the work is done today: steps, starting material, tools, checks. Each item cites its evidence (file, line or session moment). What cannot be seen is marked unknown, never guessed.
+3. **Field and exemplars.** Name one or two fields (no more). Search the web for 2–4 exemplars of top-level practice in each: published methodologies, standards, official guidance, public repos, books or talks by recognized teams. Read them. An exemplar that cannot be found and read does not count.
+4. **Practices.** From the exemplars, extract 5–8 practices that separate top-level work from correct work. For each: the technique, the concrete tool or instrument (not vocabulary), the raw material it starts from, how it checks the result (the outside judge), its source, and criteria for levels 0–3 (0 not done · 1 partial · 2 solid · 3 as the exemplars). Score current practice on each, citing the evidence from step 2.
+5. **Critic.** Spawn an isolated subagent with only `agents/ambition-critic.md`, the draft report and the exemplar links. Apply its verdicts: drop or mark what it rejects, fix the scores it disputes with evidence, add its items to "What not to copy". One pass; do not argue with it in the thread.
+6. **Plan.** Rank 3–5 gaps by impact on the outcome from step 1 against effort. Each item: the first concrete step in this project or setup, the prerequisite, the cost (free route first; paid marked), the baseline today (level and the concrete fact) and the outside judge that shows it worked.
+7. **What not to copy.** Practices that only pay off at another scale, budget or team size, with the reason.
+8. **`+range`** (only if given). Restate the work as verbs; name the fields best at those verbs, including one adversarial field; bring in their methods or checks, never their voices. Add what enters the plan.
+9. Produce the output and stop. Next turn:
+   - **Yes / item N** → implement that item as normal work; for builds, show the proposal before building.
+   - **Changes** → revise the report, show it again and ask again.
    - **No** → stop.
-
-## Lenses
-
-### Altitude — the outcome behind the task
-
-1. **Goal behind the goal:** what should happen once this is done?
-2. **Decision served:** which decision the work feeds, and who makes it.
-3. **Owning the outcome:** what the agent would need to keep the outcome true without new prompts each time (data feeds, access, a way to reproduce and verify on its own).
-4. **Process it could replace:** the recurring routine this could replace or run beside, and how to show on past data that it would have worked.
-
-For creative tasks altitude helps less: say so in one line and keep it short.
-
-### Depth — how a field-leading professional would do it
-
-1. **What the best would do** that the user is not asking for.
-2. **Rawest material** they would start from, instead of what has already been digested.
-3. **Methods and tools** they would actually use — instruments, not vocabulary (databases and statistical models instead of tables; primary sources instead of summaries).
-4. **Outside judge:** what, other than the model or the user, shows the result is right — ideally something runnable (a test, a reconciliation, held-out data, a primary source, an expert review).
-5. **Assumption to test:** one belief the task takes for granted, and how to check it against the raw material.
-
-### Range — methods from other fields
-
-1. **Verbs, not nouns:** restate the task as what it really does (a quarterly review is not "a deck": it is getting busy people to believe a cause-and-effect story and decide under uncertainty).
-2. **Fields** that are best at those verbs, including one adversarial field (red team).
-3. **What each field does:** its method, check or artifact — never its voice or persona.
-4. **What to bring in:** which of those methods enter the rewritten prompt, and why.
 
 ## Rules
 
-- Deeper, higher, wider — not bigger: no extra deliverables the outcome does not need.
-- Ambition goes into methods and goals, never into claims. Never assert that something is feasible or true to push the work; unknowns stay marked as unknown.
-- Every rewritten prompt names an outside judge. If none exists, say so in the prompt and require the result to state its confidence and what would verify it.
-- No role-play: other fields contribute methods, not voices.
-- Legal, tax or regulatory tasks: the outside judge is the primary sources (legislation, case law, administrative rulings, official guidance), cited at claim level; aggressive positions are flagged, not hidden.
-- Never run the task before the user confirms.
+- Practices come from exemplars that were read, not from model memory. Every row in "Top level" links its source.
+- Name people, firms or tools only when verified; otherwise describe the practice without a name. Never invent tools, versions, cases or citations. Keep verified fact apart from inference.
+- No role-play: exemplars contribute methods and checks, never a voice or persona.
+- Fit the practice to the user's scale; do not copy blindly.
+- Free route first; mark what is paid.
+- Every plan item has a baseline and an outside judge. If none exists, say so and state the confidence of the item.
+- Legal, tax or regulatory work: the outside judge is primary sources (legislation, case law, administrative rulings, official guidance), cited at claim level; aggressive positions are flagged, not hidden.
+- Never implement before the user confirms.
 - Answer in the user's language.
 
 ## Output
 
 ```markdown
-## Tarea
-- <the task restated in one or two lines>
+> Reviewer note — sources read · coverage (what of the work was read) · web check (date, number of searches) · critic verdict · open flags
 
-## Altura
-- Objetivo detrás del objetivo: …
-- Decisión que sirve: …
-- Para hacerse cargo del resultado: …
-- Proceso que podría sustituir: …
+## Plan
+1. <practice> — first step here · prerequisite · cost · baseline (level, fact) · judge
+2. …
 
-## Profundidad
-- Lo que haría un profesional de primer nivel: …
-- Material en bruto: …
-- Métodos y herramientas: …
-- Juez externo: …
-- Supuesto a poner a prueba: …
+## Top level
+| Practice | Source | Technique | Tool | Judge | Criteria 0–3 |
 
-## Alcance
-- En verbos: …
-- Disciplinas → qué aporta cada una: …
-- Equipo rojo: …
+## Gaps
+| Practice | Us today (0–3, evidence) | Top level | Impact | Effort |
 
-## Prompt reescrito
-<the full rewritten prompt in a fenced text block>
+## Current practice
+- …
 
-## Qué necesita el agente
+## What not to copy
+- …
+
+## Range            (only with +range)
+- …
+
+## Sources
 - …
 
 ---
-¿Ejecuto el prompt reescrito? (sí / cambia … / no)
+Implement item 1? (yes / item N / change … / no)
 ```
 
-Translate the headings when the input is not in Spanish. Drop the sections of lenses that were not selected.
+Translate headings and the closing question into the user's language. In Spanish: Nota de revisión · Plan · Primer nivel · Diferencias · Cómo lo hacemos hoy · Qué no copiar · Alcance · Fuentes · "¿Implemento el punto 1? (sí / el N / cambia … / no)".
+
+## Resources
+
+- `agents/ambition-critic.md` — contract for the isolated critic of step 5.
+
+## Harness notes
+
+- Isolated subagent: Claude Code `Agent` tool with `subagent_type: "general-purpose"`; other harnesses: their subagent or task tool. Without subagents, run the critic as a separate pass that sees only its contract and inputs.
+- Keep `agents/ambition-critic.md` in this folder; never copy it into a harness agents folder (it would show in the slash menu).
