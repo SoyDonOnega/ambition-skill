@@ -7,7 +7,8 @@ Agent skill `/ambition`: benchmark the work at hand against how a field-leading 
 - **Current practice** — how the work is done today, each point backed by evidence from the session or the files.
 - **Top level** — 5–8 practices taken from real exemplars (published methods, standards, official guidance, public repos) that were searched and read, each with its technique, tool, outside judge, source and criteria for levels 0–3.
 - **Gaps** — current practice scored 0–3 against each practice.
-- **Critic** — an isolated subagent checks sources, tools, scores and plan before the report is shown.
+- **Errors found** — defects spotted while reading the work, with `file:line`, reproduction and confidence.
+- **Critic** — an isolated subagent checks sources, tools, scores, errors and plan before the report is shown.
 - **Plan** — 3–5 items ranked by impact and effort, each with a first step in this project, prerequisite, cost (free route first), baseline and outside judge; plus what not to copy at this scale.
 - **`+range`** — optional: methods borrowed from other fields, including an adversarial one.
 
@@ -23,7 +24,7 @@ The outside-judge idea comes from Felix Rieseberg, [How to be more ambitious: A 
 /ambition +range src/pipeline/
 ```
 
-Output (in the input's language): Reviewer note → Plan → Top level → Gaps → Current practice → What not to copy → Sources → "Implement item 1? (yes / item N / change … / no)".
+Output (in the input's language): Reviewer note → Errors found → Plan → Top level → Gaps → Current practice → What not to copy → Sources → "Implement item 1? (yes / item N / change … / no)".
 
 ## Install
 
