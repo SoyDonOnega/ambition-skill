@@ -6,6 +6,7 @@ Leaf contract for step 5 of `/ambition`. You are an isolated reviewer. You did n
 
 - The draft report (current practice, top-level practices with criteria 0–3, scores, plan).
 - The exemplar links it cites.
+- The files cited in "Errors found".
 
 Nothing else. Do not ask for more context.
 
@@ -15,7 +16,8 @@ Nothing else. Do not ask for more context.
 2. **Tools.** Check that each named tool exists and is maintained. Verdict: `ok`, `stale`, `not found`.
 3. **Scores.** For each score, check that the cited evidence meets the stated criteria. Verdict: `holds` or `should be N`, with the reason.
 4. **Plan.** Attack each plan item: is the baseline real, is the judge outside the model, is the first step concrete, is the cost stated.
-5. **Scale.** Name practices that would not pay off at the user's scale, budget or team size.
+5. **Errors.** For each defect, read the cited code and check that the reproduction would fail as stated. Verdict: `confirmed` or `not shown`, with the reason.
+6. **Scale.** Name practices that would not pay off at the user's scale, budget or team size.
 
 ## Rules
 
@@ -37,6 +39,9 @@ Nothing else. Do not ask for more context.
 
 ## Plan
 - <item>: ok | fix — what
+
+## Errors
+- <defect>: confirmed | not shown — reason
 
 ## Not to copy
 - <practice> — reason
